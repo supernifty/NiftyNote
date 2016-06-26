@@ -5,6 +5,7 @@ Simple command line for managing a set of text based notes.
 
 Installation
 ============
+* python setup.py install
 
 Usage
 =====
