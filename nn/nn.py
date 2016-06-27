@@ -210,11 +210,11 @@ def main():
     subparsers = parser.add_subparsers(dest='cmd')
     subparsers.required = True
 
-    edit_sub = subparsers.add_parser('edit', help='edit note')
-    edit_sub.add_argument('title', help='add or edit note matching title')
+    edit_sub = subparsers.add_parser('edit', help='add or edit note')
+    edit_sub.add_argument('title', help='title of note to add or edit')
     edit_sub.set_defaults(func=edit)
 
-    list_sub = subparsers.add_parser('list', help='list of notes')
+    list_sub = subparsers.add_parser('list', help='list note titles')
     list_sub.add_argument('pattern', nargs='?', default=None, help='list notes with titles matching this regular expression')
     list_sub.set_defaults(func=show_list)
 
@@ -222,12 +222,12 @@ def main():
     rm_sub.add_argument('pattern', help='remove notes with titles matching this regular expression')
     rm_sub.set_defaults(func=rm)
 
-    find_sub = subparsers.add_parser('find', help='find notes matching expression')
+    find_sub = subparsers.add_parser('find', help='find notes with content or title matching pattern')
     find_sub.add_argument('pattern', help='search term')
     find_sub.set_defaults(func=find)
 
-    view_sub = subparsers.add_parser('view', help='view note')
-    view_sub.add_argument('pattern', help='view notes matching expression')
+    view_sub = subparsers.add_parser('view', help='view notes with title matching pattern')
+    view_sub.add_argument('pattern', help='search term')
     view_sub.set_defaults(func=view)
 
     args = parser.parse_args()
