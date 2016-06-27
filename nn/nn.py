@@ -178,8 +178,29 @@ def find(args, out, log):
             is_match = False
     write_log('find: done. Found {0}'.format(count), log, args.verbose)
 
-def view(args):
-    pass
+def view(args, out, log):
+    write_log('view: starting...', log, args.verbose)
+    src = open_data_source(log, args.verbose)
+    first = True
+    title = None
+    is_match = False
+    count = 0
+    for line in src:
+        if first:
+            first = False
+            title = line
+            if re.search(args.pattern, line.strip('\n'), re.I) is not None:
+                is_match = True
+                out.write(line)
+                count += 1
+        else:
+            if line.strip('\n') == TERMINATOR:
+                first = True
+                is_match = False
+            if is_match:
+                out.write('  {0}'.format(line))
+
+    write_log('view: done. Found {0}'.format(count), log, args.verbose)
 
 def main():
     parser = argparse.ArgumentParser(description='Manage a set of notes')
