@@ -81,6 +81,7 @@ def edit(args, out, log):
                 target.write(line)
                 if line.strip('\n') == TERMINATOR:
                     first = True
+
     if not found:
         new_entry = '{0}\n{1}\n'.format(args.title, DEFAULT_NOTE)
 
@@ -125,14 +126,16 @@ def rm(args, out, log):
     first = True
     in_remove = False
     count = 0
+    pattern = '^{0}$'.format(args.pattern) # force full match
     for line in src:
         if first:
             first = False
-            if re.search(args.pattern, line.strip('\n'), re.I) is not None:
+            if re.search(pattern, line.strip('\n'), re.I) is not None:
                 count += 1
-                write_log('rm: removing {0}'.format(line.strip('\n')), log, args.verbose)
+                write_log('rm: removing {0}: matches {1}'.format(line.strip('\n'), pattern), log, args.verbose)
                 in_remove = True
             else:
+                write_log('rm: keeping {0}: did not match {1}'.format(line.strip('\n'), pattern), log, args.verbose)
                 target.write(line)
         else:
             if in_remove:
@@ -140,6 +143,8 @@ def rm(args, out, log):
                     in_remove = False
             else:
                 target.write(line)
+            if line.strip('\n') == TERMINATOR:
+                first = True
     
     target.close()
     move_data_target(log, args.verbose)
