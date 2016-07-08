@@ -71,7 +71,7 @@ def edit(args, out, log):
             else:
                 new_entry += line
         else:
-            if first and line.strip('\n') == args.title:
+            if first and line.lower().strip('\n') == args.title.lower(): # case insensitive match
                 write_log('edit: note "{0}" exists'.format(args.title), log, args.verbose)
                 new_entry = line
                 found = True
@@ -130,7 +130,7 @@ def rm(args, out, log):
     for line in src:
         if first:
             first = False
-            if re.search(pattern, line.strip('\n'), re.I) is not None:
+            if re.search(pattern, line.strip('\n'), re.I) is not None: # case insensitive match
                 count += 1
                 write_log('rm: removing {0}: matches {1}'.format(line.strip('\n'), pattern), log, args.verbose)
                 in_remove = True
