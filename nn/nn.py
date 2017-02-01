@@ -63,6 +63,7 @@ def edit(args, out, log):
     in_found = False
     first = True
     new_entry = ''
+    # write everything except the entry of interest
     for line in src:
         if in_found:
             if line.strip('\n') == TERMINATOR:
@@ -81,6 +82,8 @@ def edit(args, out, log):
                 target.write(line)
                 if line.strip('\n') == TERMINATOR:
                     first = True
+                else:
+                    first = False
 
     if not found:
         new_entry = '{0}\n{1}\n'.format(args.title, DEFAULT_NOTE)
@@ -92,6 +95,7 @@ def edit(args, out, log):
         tf.write(new_entry)
         tf.flush()
         subprocess.call([editor, tf.name])
+        # read back updated version
         with open(tf.name) as tfr:
             found = False
             for line in tfr:
