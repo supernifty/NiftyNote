@@ -1,20 +1,26 @@
 #!/usr/bin/env python
 
-#from distutils.core import setup
-from setuptools import setup
+import setuptools
+import pathlib
 
-setup(
-    name='nn',
-    version='1.0',
+name = "nn"
+version = "0.1"
+release = "0.1.0"
+here = pathlib.Path(__file__).parent.resolve()
+
+setuptools.setup(
+    name=name,
+    version=version,
     author='Peter Georgeson',
     author_email='peter@supernifty.org',
-    packages=['nn'],
-    package_dir={'nn': 'nn'},
+    packages=setuptools.find_packages(),
     entry_points={
-        'console_scripts': ['nn = nn.nn:main']
+        'console_scripts': [
+            'dotplot = nn.nn:main',
+        ],
     },
     url='https://github.com/supernifty/NiftyNote',
-    license='LICENSE',
     description=('Manage text notes'),
     long_description=('Manage text notes'),
+    license="LICENSE"
 )
