@@ -3,5 +3,14 @@ body {
 }
 
 textarea.form-control {
-    height: 100%;
+  height: 100%;
+  border-color: #ff9090;
+}
+
+#rendered {
+  border: 1px solid #c0c0c0;
+}
+
+#content, update, #cancel, #edit, #cancel, #delete {
+  display: none;
 }

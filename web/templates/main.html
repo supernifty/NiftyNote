@@ -16,7 +16,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css', v='170925') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css', v='171229') }}">
 
   </head>
   <body>
@@ -51,10 +51,12 @@
             </div>
             <div class="col-md-8 main">
                 <textarea id="content" class="form-control" rows="50">
-No item selected
                 </textarea>
+                <div id="rendered">No item selected</div>
                 <div>&nbsp;</div>
+                <button type="button" class="btn btn-primary" id="edit">Edit</button>
                 <button type="button" class="btn btn-primary" id="update">Update</button>
+                <button type="button" class="btn btn-primary" id="cancel">Cancel</button>
                 <button type="button" class="btn btn-danger" id="delete">Delete</button>
                 <span id="status"></span>
             </div>
@@ -65,7 +67,9 @@ No item selected
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
-    <script src="{{ url_for('static', filename='main.js', v='171126b') }}"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.9/marked.min.js"></script>
+    <script src="{{ url_for('static', filename='main.js', v='171230') }}"></script>
   </body>
   <script>
   $(document).ready(function () {

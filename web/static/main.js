@@ -15,6 +15,8 @@ var
       $('#update').on('click', on_update);
       $('#delete').on('click', on_remove);
       $('#create').on('click', on_create);
+      $('#edit').on('click', on_edit);
+      $('#cancel').on('click', on_cancel);
       load();
   },
 
@@ -40,24 +42,41 @@ var
   },
 
   show_content = function(data) {
-    $('#content').val(data)
+    $('#content').val(data);
+    render(data);
+    $('#update,#cancel,#content,#delete').hide();
+    $('#edit,#rendered').show();
+  },
+
+  render = function(data) {
+    $('#rendered').html(marked(data));
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   },
 
   on_update = function(ev) {
     if (current_name == undefined) {
         return;
     }
+    var content = $('#content').val(); 
     $.post( update_item_url + '/' + current_name, {
-      'content': $('#content').val()
+      'content': content
     })
-    .done(function() { $('#status').text('Item updated'); });
+    .done(function() { 
+      $('#status').text('Item updated'); 
+      render(content);
+      $('#edit,#rendered').show();
+      $('#content,#update,#cancel,#delete').hide();
+    });
   },
 
   on_remove = function(ev) {
     if (confirm("Are you sure?")) {
-      $.post(remove_item_url + '/' + current_name).done(function() { $('#status').text('Item removed'); load() });
+      $.post(remove_item_url + '/' + current_name).done(function() { 
+        $('#status').text('Item removed'); 
+        load() 
+      });
     } else {
-      // ok
+      // not removed
     }
   },
 
@@ -67,13 +86,25 @@ var
       $.post(create_item_url + '/' + title).done(function(response) { 
           if (response == 'created') {
               $('#status').text('Item added'); 
-              load() 
+              load();
           }
           else {
               $('#status').text('Item exists'); 
           }});
     }
   },
+
+  on_edit = function(ev) {
+    $('#update,#cancel,#content,#delete').show();
+    $('#edit,#rendered').hide();
+    $('#status').text(''); 
+  },
+
+  on_cancel = function(ev) {
+    $('#update,#cancel,#content,#delete').hide();
+    $('#edit,#rendered').show();
+  },
+
 
   show_list = function(data) {
     var converted = [];
@@ -94,5 +125,6 @@ var
       });
       $('#table_names tbody').on('click', 'tr', on_name);
       $('.main').height(($('.sidebar').height()));
-      $('#content').val('Select an item');
+      $('#rendered').val('Select an item');
+      $('#update,#cancel,#content,#delete,#edit').hide();
   }
