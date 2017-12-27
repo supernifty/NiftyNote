@@ -7,6 +7,17 @@ var
   current_name,
 
   init = function(show_url, item_url, update_url, remove_url, create_url) {
+      var renderer = new marked.Renderer();
+      renderer.table = function(header, body) {
+        return "<table class='table table-striped'><thead>" + 
+            header + 
+            "</thead><tbody>" + 
+            body + 
+            "</tbody></table>";
+      }
+      marked.setOptions({
+        renderer: renderer
+      });
       show_list_url = show_url;
       show_item_url = item_url;
       update_item_url = update_url;
