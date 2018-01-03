@@ -4,6 +4,8 @@ var
   update_item_url = '', 
   remove_item_url = '', 
   create_item_url = '', 
+  loaded_content = '', 
+  unsaved = false,
   current_name,
 
   init = function(show_url, item_url, update_url, remove_url, create_url) {
@@ -23,11 +25,12 @@ var
       update_item_url = update_url;
       remove_item_url = remove_url;
       create_item_url = create_url;
-      $('#update').on('click', on_update);
+      $('#update').on('click', on_save);
       $('#delete').on('click', on_remove);
       $('#create').on('click', on_create);
       $('#edit').on('click', on_edit);
       $('#cancel').on('click', on_cancel);
+      $("#content").on('change keyup paste mouseup', content_changed);
       load();
   },
 
@@ -43,16 +46,29 @@ var
     alert('An error occurred');
   },
 
+  content_changed = function() {
+    if ($(this).val() != loaded_content) {
+      unsaved = true;
+    }
+  },
+
   on_name = function(ev) {
-    current_name = $('#table_names').DataTable().row(this).data()[0];
-    $.ajax({
-        url: show_item_url + '/' + current_name
-      })
-      .done(show_content)
-      .fail(show_error);
+    if (!unsaved || confirm("'" + current_name + "' has not been saved. Are you sure?")) {
+      current_name = $('#table_names').DataTable().row(this).data()[0];
+      $.ajax({
+          url: show_item_url + '/' + current_name
+        })
+        .done(show_content)
+        .fail(show_error);
+    }
+    else {
+      return false;
+    }
   },
 
   show_content = function(data) {
+    loaded_content = data;
+    unsaved = false;
     $('#content').val(data);
     render(data);
     $('#update,#cancel,#content,#delete').hide();
@@ -64,7 +80,7 @@ var
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   },
 
-  on_update = function(ev) {
+  on_save = function(ev) {
     if (current_name == undefined) {
         return;
     }
@@ -73,7 +89,9 @@ var
       'content': content
     })
     .done(function() { 
-      $('#status').text('Item updated'); 
+      $('#status').text('Saved "' + current_name + '"'); 
+      loaded_content = content;
+      unsaved = false;
       render(content);
       $('#edit,#rendered').show();
       $('#content,#update,#cancel,#delete').hide();
@@ -81,7 +99,7 @@ var
   },
 
   on_remove = function(ev) {
-    if (confirm("Are you sure?")) {
+    if (confirm("Are you sure you want to remove '" + current_name + "'?")) {
       $.post(remove_item_url + '/' + current_name).done(function() { 
         $('#status').text('Item removed'); 
         load() 
@@ -125,7 +143,7 @@ var
     $('#table_names').DataTable({
         "destroy": true,
         "paging": true,
-        "iDisplayLength": 10,
+        "iDisplayLength": 25,
         "searching": true,
         "bInfo" : false,
         "data": converted,
