@@ -136,10 +136,7 @@ var
 
 
   show_list = function(data) {
-    var converted = [];
-    for (var i in data["data"]) {
-        converted.push([data["data"][i]]);
-    }
+    var converted = data["data"];
     $('#table_names').DataTable({
         "destroy": true,
         "paging": true,
@@ -150,7 +147,14 @@ var
         "select": {
             style: 'os',
             selector: 'td:first-child'
-        }
+        },
+        "columnDefs": [
+          {
+            "targets": [1],
+            "visible": false,
+            "searchable": true
+          }
+        ]
       });
       $('#table_names tbody').on('click', 'tr', on_name);
       $('.main').height(($('.sidebar').height()));

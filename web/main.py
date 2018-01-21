@@ -55,21 +55,32 @@ def main():
 def show_list(filter=None):
     src = open_data_source()
     first = True
+    content = None
     count = 0
     result = []
     for line in src:
-        if first:
+        if first: # start of entry
             first = False
             if not filter or re.search(filter, line.strip('\n'), re.I) is not None:
-                result.append(line.strip('\n'))
+                result.append([line.strip('\n'), None]) # title, content
                 count += 1
-        elif line.strip('\n') == TERMINATOR:
+                content = []
+        elif line.strip('\n') == TERMINATOR: # end of entry
             first = True
+            if content is not None:
+                result[-1][1] = ''.join(content)
+                content = None
+        else:
+            if content is not None:
+                content.append(line)
     return flask.jsonify(data=result) 
 
 @app.route('/item', defaults={'name': None}, methods=['GET', 'POST'])
 @app.route('/item/<name>', methods=['GET', 'POST'])
 def show_item(name):
+    '''
+      extracts content of a given entry
+    '''
     src = open_data_source()
     first = True
     title = None
@@ -94,6 +105,9 @@ def show_item(name):
 @app.route('/update', defaults={'name': None}, methods=['POST'])
 @app.route('/update/<name>', methods=['POST'])
 def save_item(name):
+    '''
+      updates entry with new content
+    '''
     src = open_data_source()
     target = open_data_target()
     found = False
@@ -132,6 +146,9 @@ def save_item(name):
 @app.route('/remove', defaults={'name': None}, methods=['POST'])
 @app.route('/remove/<name>', methods=['POST'])
 def remove_item(name):
+    '''
+      removes specified entry
+    '''
     src = open_data_source()
     target = open_data_target()
     found = False
@@ -165,6 +182,9 @@ def remove_item(name):
 @app.route('/create', defaults={'name': None}, methods=['POST'])
 @app.route('/create/<name>', methods=['POST'])
 def create_item(name):
+    '''
+      creates an empty entry
+    '''
     src = open_data_source()
     target = open_data_target()
     found = False
