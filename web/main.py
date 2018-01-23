@@ -4,56 +4,41 @@
 '''
 import os
 import re
-import shutil
 
 import flask
 
-__APPNAME__ = 'NiftyNote'
+import auth
+import config
+import store
+
 TERMINATOR = '== terminator =='
 DEFAULT_NOTE = 'Put your note content here'
+AUTHORIZED_URL = '/authorized'
 
 app = flask.Flask(__name__, template_folder='templates')
 app.config.from_pyfile('config.py')
 app.secret_key = 'ducks in space'
 
-def open_data_source():
-    #write_log('reading notes...', log, verbose)
-    appdir = os.path.expanduser(os.path.join("~", "." + __APPNAME__))
-    appfile = os.path.join(appdir, 'notes.txt')
-    if os.path.exists(appfile):
-        #write_log('reading notes: file found', log, verbose)
-        return open(appfile, 'r')
-    else:
-        #write_log('reading notes: no notes found', log, verbose)
-        return []
-
-def open_data_target():
-    appdir = os.path.expanduser(os.path.join("~", "." + __APPNAME__))
-    appfile = os.path.join(appdir, 'notes.new')
-    if not os.path.exists(appdir):
-        os.makedirs(appdir)
-    return open(appfile, 'w')
-
-def move_data_target():
-    appdir = os.path.expanduser(os.path.join("~", "." + __APPNAME__))
-    appfile = os.path.join(appdir, 'notes.txt')
-    newfile = os.path.join(appdir, 'notes.new')
-    oldfile = os.path.join(appdir, 'notes.old')
-    if os.path.exists(appfile):
-        shutil.move(appfile, oldfile)
-    shutil.move(newfile, appfile)
+if config.AUTHENTICATE:
+    authenticator = auth.GoogleAuth(app)
+else:
+    authenticator = auth.NoAuth(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
     '''
         main entry point
     '''
-    return flask.render_template('main.html')
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return flask.redirect(flask.url_for('login'))
+    return flask.render_template('main.html', username=authenticator.username(flask.session))
 
 @app.route('/list', defaults={'filter': None}, methods=['GET', 'POST'])
 @app.route('/list/<filter>', methods=['GET', 'POST'])
 def show_list(filter=None):
-    src = open_data_source()
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return None # shouldn't happen
+    src = store.open_data_source(authenticator.username(flask.session))
     first = True
     content = None
     count = 0
@@ -81,7 +66,9 @@ def show_item(name):
     '''
       extracts content of a given entry
     '''
-    src = open_data_source()
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return None # shouldn't happen
+    src = store.open_data_source(authenticator.username(flask.session))
     first = True
     title = None
     is_match = False
@@ -108,8 +95,10 @@ def save_item(name):
     '''
       updates entry with new content
     '''
-    src = open_data_source()
-    target = open_data_target()
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return None # shouldn't happen
+    src = store.open_data_source(authenticator.username(flask.session))
+    target = store.open_data_target(authenticator.username(flask.session))
     found = False
     in_found = False
     first = True
@@ -140,7 +129,7 @@ def save_item(name):
     target.write(flask.request.form["content"])
     target.write('\n{0}\n'.format(TERMINATOR))
     target.close()
-    move_data_target()
+    store.move_data_target(authenticator.username(flask.session))
     return "saved"
 
 @app.route('/remove', defaults={'name': None}, methods=['POST'])
@@ -149,8 +138,10 @@ def remove_item(name):
     '''
       removes specified entry
     '''
-    src = open_data_source()
-    target = open_data_target()
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return None # shouldn't happen
+    src = store.open_data_source(authenticator.username(flask.session))
+    target = store.open_data_target(authenticator.username(flask.session))
     found = False
     in_found = False
     first = True
@@ -176,7 +167,7 @@ def remove_item(name):
                 else:
                     first = False
     target.close()
-    move_data_target()
+    store.move_data_target(authenticator.username(flask.session))
     return "removed"
 
 @app.route('/create', defaults={'name': None}, methods=['POST'])
@@ -185,8 +176,10 @@ def create_item(name):
     '''
       creates an empty entry
     '''
-    src = open_data_source()
-    target = open_data_target()
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return None # shouldn't happen
+    src = store.open_data_source(authenticator.username(flask.session))
+    target = store.open_data_target(authenticator.username(flask.session))
     found = False
     in_found = False
     first = True
@@ -218,9 +211,32 @@ def create_item(name):
         new_entry = '{0}\n{1}\n{2}\n'.format(name, DEFAULT_NOTE, TERMINATOR)
         target.write(new_entry)
         target.close()
-        move_data_target()
+        store.move_data_target(authenticator.username(flask.session))
 
     return "created"
+
+### authentication logic ###
+@app.route('/login')
+def login():
+    return authenticator.authorize()
+
+@app.route('/logout')
+def logout():
+    authenticator.logout(flask.session)
+    return flask.redirect(flask.url_for('main'))
+
+# end up here after authentication
+@app.route('/authorized')
+def authorized():
+    result = authenticator.authorized(flask.session)
+    if result is None:
+        return flask.redirect(flask.url_for('main'))
+    else:
+        return result # todo: error page
+
+@authenticator.google.tokengetter
+def get_google_oauth_token():
+    return authenticator.token(flask.session)
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0')

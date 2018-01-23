@@ -33,7 +33,9 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Help</a></li>
+            {% if username %}
+            <li><a href="{{ url_for('logout') }}">Logout {{ username }}</a></li>
+            {% endif %}
           </ul>
         </div>
       </div>
