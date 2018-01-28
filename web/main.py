@@ -9,6 +9,7 @@ import flask
 
 import auth
 import config
+import proxy
 import store
 
 TERMINATOR = '== terminator =='
@@ -16,6 +17,7 @@ DEFAULT_NOTE = 'Put your note content here'
 AUTHORIZED_URL = '/authorized'
 
 app = flask.Flask(__name__, template_folder='templates')
+app.wsgi_app = proxy.ReverseProxied(app.wsgi_app)
 app.config.from_pyfile('config.py')
 app.secret_key = 'ducks in space'
 
