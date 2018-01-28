@@ -33,9 +33,6 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            {% if username %}
-            <li><a href="{{ url_for('logout') }}">Logout {{ username }}</a></li>
-            {% endif %}
             <li><a href="{{ url_for('help') }}">Help</a></li>
           </ul>
         </div>
@@ -44,27 +41,34 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-4 sidebar">
-                <table id="table_names" class="display compact">
-                    <thead>
-                        <tr>
-                          <th>Title</th>
-                          <th>Content</th>
-                        </tr>
-                    </thead>
-                </table>
-                <button type="button" class="btn btn-primary" id="create">Add New</button>
-            </div>
             <div class="col-md-8 main">
-                <textarea id="content" class="form-control" rows="50">
-                </textarea>
-                <div id="rendered">No item selected</div>
-                <div>&nbsp;</div>
-                <button type="button" class="btn btn-primary" id="edit">Edit</button>
-                <button type="button" class="btn btn-primary" id="update">Update</button>
-                <button type="button" class="btn btn-primary" id="cancel">Cancel</button>
-                <button type="button" class="btn btn-danger" id="delete">Delete</button>
-                <span id="status"></span>
+<p>
+  <a href="{{ url_for('main') }}">Nifty Note</a> is a simple, lightweight note-taking application.
+  It provides a web-based and command line tool for managing text-based notes.
+</p>
+<h4>Features</h4>
+<p>
+  <li>Write plaintext or markdown. Math formulas are supported via MathJax.</li>
+  <li>Access your notes anywhere, from any device.</li>
+  <li>Use Supernifty's <a href="https://note.supernifty.org/">online application</a>, or run locally by <a href="https://github.com/supernifty/NiftyNote">forking the GitHub repository</a>.
+  <li>Open source. Check out the code at <a href="https://github.com/supernifty/NiftyNote"</a>GitHub</a>.</li> 
+</p>
+<h4>Other Notes</h4>
+<p>
+  <li>The online version uses Google for authentication.</li>
+  <li>Use of the service is currently free. We may introduce a subscription model for more substantial usage. Though if this is an issue you can always run your own local version of the software.</li>
+  <li>Have a suggestion? <a href="https://github.com/supernifty/NiftyNote/issues">Raise an issue</a> or contribute to the project. Alternatively you can <a href="http://www.supernifty.org/contact.php">contact Supernifty</a>.</li>
+</p>
+<h4>Important</h4>
+<p>
+  Use of NiftyNote is completely <strong>at your own risk</strong>.
+  Although we do our best to protect your data and maintain the Supernifty service, we provide no guarantee of fitness for use.
+  Supernifty reserves the right to terminate or block any account for any reason.
+</p>
+<p>
+  <a href="{{ url_for('main') }}" class="btn btn-primary" role="button">Go to Nifty Note</a><br/>
+  You will be authenticated using Google.
+</p>
             </div>
         </div>
     </div>
@@ -77,9 +81,4 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.9/marked.min.js"></script>
     <script src="{{ url_for('static', filename='main.js', v='171232') }}"></script>
   </body>
-  <script>
-  $(document).ready(function () {
-    init("{{ url_for('show_list') }}", "{{ url_for('show_item') }}", "{{ url_for('save_item') }}", "{{ url_for('remove_item') }}", "{{ url_for('create_item') }}");
-  });
-  </script>
 </html>

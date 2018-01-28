@@ -26,6 +26,11 @@ if config.AUTHENTICATE:
 else:
     authenticator = auth.NoAuth(app)
 
+
+@app.route('/help', methods=['GET'])
+def help():
+    return flask.render_template('help.html')
+
 @app.route('/', methods=['GET', 'POST'])
 def main():
     '''
@@ -225,7 +230,7 @@ def login():
 @app.route('/logout')
 def logout():
     authenticator.logout(flask.session)
-    return flask.redirect(flask.url_for('main'))
+    return flask.redirect(flask.url_for('help'))
 
 # end up here after authentication
 @app.route('/authorized')
