@@ -9,6 +9,7 @@ import flask
 
 import auth
 import config
+import io
 import proxy
 import store
 
@@ -39,6 +40,16 @@ def main():
     if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
         return flask.redirect(flask.url_for('login'))
     return flask.render_template('main.html', username=authenticator.username(flask.session))
+
+@app.route('/export', methods=['GET', 'POST'])
+def export():
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return flask.redirect(flask.url_for('login'))
+    src = store.open_data_source(authenticator.username(flask.session))
+    response = flask.make_response(src.read())
+    response.headers['Content-Type'] = 'text/plain'
+    response.headers['Content-Disposition'] = 'attachment; filename=notes.txt'
+    return response
 
 @app.route('/list', defaults={'filter': None}, methods=['GET', 'POST'])
 @app.route('/list/<filter>', methods=['GET', 'POST'])
