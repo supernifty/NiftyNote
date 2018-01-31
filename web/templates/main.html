@@ -16,6 +16,8 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css', v='171229') }}">
 
   </head>
@@ -57,14 +59,14 @@
                 <button type="button" class="btn btn-primary" id="create">Add New</button>
             </div>
             <div class="col-md-8 main">
+                <div><span id="title"></span>&nbsp;&nbsp;<a href="#" id="rename"><i title="Rename title" class="fas fa-edit"></i></a></div>
                 <textarea id="content" class="form-control" rows="50">
                 </textarea>
                 <div id="rendered">No item selected</div>
-                <div>&nbsp;</div>
-                <button type="button" class="btn btn-primary" id="edit">Edit</button>
-                <button type="button" class="btn btn-primary" id="update">Update</button>
-                <button type="button" class="btn btn-primary" id="cancel">Cancel</button>
-                <button type="button" class="btn btn-danger" id="delete">Delete</button>
+                <button type="button" class="btn btn-primary btn-space" id="edit">Edit</button>
+                <button type="button" class="btn btn-primary btn-space" id="update">Update</button>
+                <button type="button" class="btn btn-primary btn-space" id="cancel">Cancel</button>
+                <button type="button" class="btn btn-danger btn-space" id="delete">Delete</button>
                 <span id="status"></span>
             </div>
         </div>
@@ -81,7 +83,7 @@
   </body>
   <script>
   $(document).ready(function () {
-    init("{{ url_for('show_list') }}", "{{ url_for('show_item') }}", "{{ url_for('save_item') }}", "{{ url_for('remove_item') }}", "{{ url_for('create_item') }}");
+    init("{{ url_for('show_list') }}", "{{ url_for('show_item') }}", "{{ url_for('save_item') }}", "{{ url_for('remove_item') }}", "{{ url_for('create_item') }}", "{{ url_for('rename_item') }}");
   });
   </script>
 </html>

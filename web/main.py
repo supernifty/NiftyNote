@@ -150,6 +150,48 @@ def save_item(name):
     store.move_data_target(authenticator.username(flask.session))
     return "saved"
 
+@app.route('/rename', defaults={'name': None, 'target': None}, methods=['POST'])
+@app.route('/rename/<name>/<target>/', methods=['POST'])
+def rename_item(name, target):
+    if config.AUTHENTICATE and not authenticator.is_auth(flask.session):
+        return None # shouldn't happen
+    src_fh = store.open_data_source(authenticator.username(flask.session))
+    target_fh = store.open_data_target(authenticator.username(flask.session))
+    found = False
+    in_found = False
+    first = True
+    new_entry = ''
+    # write everything except the entry of interest
+    for line in src_fh:
+        if in_found:
+            if line.strip('\n') == TERMINATOR:
+                in_found = False
+                first = True
+            else:
+                new_entry += line
+        else:
+            if first and line.lower().strip('\n') == name.lower(): # case insensitive match
+                new_entry = '{}\n'.format(target)
+                found = True
+                in_found = True
+                first = False
+            else:
+                if first and line.lower().strip('\n') == target.lower(): # case insensitive match
+                    return "exists"
+
+                target_fh.write(line)
+                if line.strip('\n') == TERMINATOR:
+                    first = True
+                else:
+                    first = False
+
+    new_entry = '{0}\n{1}\n'.format(new_entry, TERMINATOR)
+    target_fh.write(new_entry)
+    target_fh.close()
+    store.move_data_target(authenticator.username(flask.session))
+
+    return "renamed"
+
 @app.route('/remove', defaults={'name': None}, methods=['POST'])
 @app.route('/remove/<name>', methods=['POST'])
 def remove_item(name):

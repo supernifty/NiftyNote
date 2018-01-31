@@ -4,11 +4,12 @@ var
   update_item_url = '', 
   remove_item_url = '', 
   create_item_url = '', 
+  rename_item_url = '', 
   loaded_content = '', 
   unsaved = false,
   current_name,
 
-  init = function(show_url, item_url, update_url, remove_url, create_url) {
+  init = function(show_url, item_url, update_url, remove_url, create_url, rename_url) {
       var renderer = new marked.Renderer();
       renderer.table = function(header, body) {
         return "<table class='table table-striped'><thead>" + 
@@ -25,11 +26,13 @@ var
       update_item_url = update_url;
       remove_item_url = remove_url;
       create_item_url = create_url;
+      rename_item_url = rename_url;
       $('#update').on('click', on_save);
       $('#delete').on('click', on_remove);
       $('#create').on('click', on_create);
       $('#edit').on('click', on_edit);
       $('#cancel').on('click', on_cancel);
+      $('#rename').on('click', on_rename);
       $("#content").on('change keyup paste mouseup', content_changed);
       load();
   },
@@ -69,10 +72,11 @@ var
   show_content = function(data) {
     loaded_content = data;
     unsaved = false;
+    $('#title').text(current_name);
     $('#content').val(data);
     render(data);
     $('#update,#cancel,#content,#delete').hide();
-    $('#edit,#rendered').show();
+    $('#edit,#rendered,#rename').show();
   },
 
   render = function(data) {
@@ -106,6 +110,21 @@ var
       });
     } else {
       // not removed
+    }
+  },
+
+  on_rename = function(ev) {
+    var title = prompt("Enter the new title.", current_name);
+    if (title != null) {
+      $.post(rename_item_url + '/' + current_name + '/' + title + '/').done(function(response) { 
+          if (response == 'renamed') {
+              $('#status').text('Item renamed.'); 
+              current_name = title;
+              $('#title').text(current_name);
+          }
+          else {
+              $('#status').text('Proposed name already exists.'); 
+          }});
     }
   },
 
@@ -159,5 +178,5 @@ var
       $('#table_names tbody').on('click', 'tr', on_name);
       $('.main').height(($('.sidebar').height()));
       $('#rendered').val('Select an item');
-      $('#update,#cancel,#content,#delete,#edit').hide();
+      $('#update,#cancel,#content,#delete,#edit,#rename').hide();
   }

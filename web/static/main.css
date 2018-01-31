@@ -11,6 +11,18 @@ textarea.form-control {
   border: 1px solid #c0c0c0;
 }
 
-#content, update, #cancel, #edit, #cancel, #delete {
+#content, #update, #cancel, #edit, #cancel, #delete, #rename {
   display: none;
+}
+
+#title {
+  font-weight: bold;
+}
+
+.btn-space {
+  margin: 4px 2px 4px 0;
+}
+
+.slice {
+  height: 2px;
 }
